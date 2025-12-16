@@ -1,7 +1,7 @@
 import React from "react";
 
 function GuessInput({ guess, setGuess }) {
-  const onSubmit = React.useCallback(
+  const handleGuessSubmit = React.useCallback(
     (e) => {
       e.preventDefault();
       console.log({ guess });
@@ -11,7 +11,7 @@ function GuessInput({ guess, setGuess }) {
   );
 
   return (
-    <form onSubmit={onSubmit} className="guess-input-wrapper">
+    <form onSubmit={handleGuessSubmit} className="guess-input-wrapper">
       <label htmlFor="guess-input">Enter guess:</label>
       <input
         id="guess-input"
