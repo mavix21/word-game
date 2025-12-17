@@ -5,6 +5,7 @@ import { WORDS } from "../../data";
 import GuessInput from "../GuessInput/GuessInput";
 import Guess from "../Guess/Guess";
 import { NUM_OF_GUESSES_ALLOWED } from "../../constants";
+import { checkGuess } from "../../game-helpers";
 
 // Pick a random word on every pageload.
 const answer = sample(WORDS);
@@ -12,8 +13,21 @@ const answer = sample(WORDS);
 console.info({ answer });
 
 function Game() {
-  const [guess, setGuess] = React.useState("");
   const [guessHistory, setGuessHistory] = React.useState([]);
+
+  const guessCheckStatus = guessHistory.map((guess) =>
+    checkGuess(guess, answer)
+  );
+
+  const gameWon =
+    guessHistory.length > 0 &&
+    guessCheckStatus
+      .at(-1)
+      .every((charStatus) => charStatus.status === "correct");
+  const gameLost = !gameWon && guessHistory.length >= 6;
+  const gameOver = gameWon || gameLost;
+
+  console.log("game status", { gameOver });
 
   const addToGuessHistory = React.useCallback((guess) => {
     setGuessHistory((prev) => [...prev, guess]);
@@ -21,17 +35,28 @@ function Game() {
 
   return (
     <div className="wrapper">
-      <div class="game-wrapper">
+      <div className="game-wrapper">
         <div className="guess-results">
           {range(NUM_OF_GUESSES_ALLOWED).map((n, i) => (
-            <Guess key={n} guess={guessHistory[i]} answer={answer} />
+            <Guess key={n} guessCheckStatus={guessCheckStatus[i]} />
           ))}
         </div>
-        <GuessInput
-          guess={guess}
-          setGuess={setGuess}
-          onSubmit={addToGuessHistory}
-        />
+        <GuessInput onSubmit={addToGuessHistory} disabled={gameOver} />
+        {gameWon && (
+          <div className="happy banner">
+            <p>
+              <strong>Congratulations!</strong> Got it in
+              <strong>{guessHistory.length} guesses</strong>.
+            </p>
+          </div>
+        )}
+        {gameLost && (
+          <div className="sad banner">
+            <p>
+              Sorry, the correct answer is <strong>{answer}</strong>.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
