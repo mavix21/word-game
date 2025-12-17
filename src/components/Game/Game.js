@@ -7,13 +7,12 @@ import Guess from "../Guess/Guess";
 import { NUM_OF_GUESSES_ALLOWED } from "../../constants";
 import { checkGuess } from "../../game-helpers";
 
-// Pick a random word on every pageload.
-const answer = sample(WORDS);
-// To make debugging easier, we'll log the solution in the console.
-console.info({ answer });
-
 function Game() {
+  const [answer, setAnswer] = React.useState(() => sample(WORDS));
   const [guessHistory, setGuessHistory] = React.useState([]);
+
+  // To make debugging easier, we'll log the solution in the console.
+  console.info({ answer });
 
   const guessCheckStatus = guessHistory.map((guess) =>
     checkGuess(guess, answer)
@@ -27,10 +26,13 @@ function Game() {
   const gameLost = !gameWon && guessHistory.length >= 6;
   const gameOver = gameWon || gameLost;
 
-  console.log("game status", { gameOver });
-
   const addToGuessHistory = React.useCallback((guess) => {
     setGuessHistory((prev) => [...prev, guess]);
+  }, []);
+
+  const resetGame = React.useCallback(() => {
+    setGuessHistory([]);
+    setAnswer(sample(WORDS));
   }, []);
 
   return (
@@ -48,6 +50,7 @@ function Game() {
               <strong>Congratulations!</strong> Got it in
               <strong>{guessHistory.length} guesses</strong>.
             </p>
+            <button onClick={resetGame}>Play again</button>
           </div>
         )}
         {gameLost && (
@@ -55,6 +58,7 @@ function Game() {
             <p>
               Sorry, the correct answer is <strong>{answer}</strong>.
             </p>
+            <button onClick={resetGame}>Try again</button>
           </div>
         )}
       </div>
