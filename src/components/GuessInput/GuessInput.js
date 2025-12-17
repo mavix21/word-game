@@ -1,6 +1,6 @@
 import React from "react";
 
-function GuessInput({ onSubmit }) {
+function GuessInput({ onSubmit, disabled }) {
   const [guess, setGuess] = React.useState("");
 
   const handleGuessSubmit = React.useCallback(
@@ -18,6 +18,7 @@ function GuessInput({ onSubmit }) {
       <input
         id="guess-input"
         type="text"
+        disabled={disabled}
         value={guess}
         required
         pattern="\w{5,5}"
